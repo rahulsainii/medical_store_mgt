@@ -1,0 +1,49 @@
+ if(selected_row!=-1&&stock!=null&&selected_row<stock.size())
+        {
+           req_qty=sales_tf1.getText().trim();
+           avail_stock=stock.get(selected_row);
+           String[] col_names={"MEDICINE NAME","BATCH NO","MFD DATE","EXP_DATE","PRICE","qty"};
+           Object[][] record;
+            
+           if(Validations.isInteger(req_qty))
+                        int req_qty1=Integer.parseInt(req_qty);
+             if(req_qty1<=avail_stock.getQty())
+             {     
+                 if(next_stock==null){
+                     next_stock = new ArrayList<>();
+                 }
+                record=new Object[stock.size()+5][col_names.length];
+                record[size]=new Object[]{avail_stock.getMedicine_name(),avail_stock.getBatch_no(),avail_stock.getMfd_date(),avail_stock.getExp_date(),avail_stock.getPrice(),req_qty1};
+                size++;
+                System.out.println(avail_stock.getMedicine_code());
+                avail_stock.setQty(Integer.parseInt(req_qty));
+                next_stock.add(avail_stock);
+                DefaultTableModel model=new DefaultTableModel(record,col_names);
+                sales_table2.setModel(model);
+                selected_row=-1;
+              }
+             else
+             {
+                 msg+=" QTY NOT AVAILABLE IN STOCK";
+                 JOptionPane.showMessageDialog(this,msg);
+             }
+           }
+        }
+------------------------------------------------------------------------------------------------------------------------------------------------
+String query ="select sum(qty) from medicine.stock\n" +
+                           "where medicine_code = ? and stock_type = 'IN' and batch_no=?";
+            String query1="select sum(qty) from medicine.stock\n"+
+                          "where medicine_code = ? and stock_type = ?";
+            
+            PreparedStatement stmt = DataConnection.preparestatement(query);
+            stmt.setString(1, medicine_code);
+            stmt.setString(2,batch_no);
+            PreparedStatement stmt1 = DataConnection.preparestatement(query1);
+            stmt1.setString(1, medicine_code);
+            stmt1.setString(2,batch_no);
+            ResultSet rs = stmt.executeQuery();
+            ResultSet rs1 = stmt.executeQuery();
+            int result=rs.getInt("qty");
+            int result1=rs1.getInt("qty");
+            
+            return (result-result1);
